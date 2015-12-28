@@ -254,6 +254,9 @@ func main() {
 The type *T is a pointer to a T value. Its zero value is nil.
 ```
 var p *int
+// for instantiating:
+i := 13
+var pp *int = &i
 ```
 
 ### Struct
@@ -329,24 +332,6 @@ type House struct { }
 func (h House) GetHouseName() string { } //method defined outside of struct, but works on House
 ```
 [source](http://golangtutorials.blogspot.com/2011/06/structs-in-go-instead-of-classes-in.html)
-
-
-- **IMPORTANT: **
-we can define methods on struct types instead of classes
-In Go, you define a method receiver to specify which struct to attach a certain function to in order to make it invoke-able as a method.
-```
-package main
-import "fmt"
-type Dog struct {
-}
-func (d Dog) Say() {
-    fmt.Println("Woof!")
-}
-func main() {
-    d := &Dog{}
-    d.Say()
-}
-```
 
 ### Arrays
 - Like type, the capacity comes BEFORE the type
@@ -508,3 +493,147 @@ func main() {
 }
 ```
 - // NOTE: unlike javascript you cannot print the function (pos or neg)
+
+### Methods
+- **IMPORTANT: **
+we can define methods on struct types instead of classes
+In Go, you define a method receiver to specify which struct to attach a certain function to in order to make it invoke-able as a method.
+```
+package main
+import "fmt"
+type Dog struct {
+}
+func (d Dog) Say() {
+    fmt.Println("Woof!")
+}
+func main() {
+    // NOTE:
+    // d is a pointer that points to Dog{}
+    // it's equal to
+    // var d *Dog = &Dog{}
+    d := &Dog{}
+    d.Say()
+}
+```
+- why we need to use pointer to pass the new dog:[HERE](http://nathanleclaire.com/blog/2014/08/09/dont-get-bitten-by-pointer-vs-non-pointer-method-receivers-in-golang/)
+we may want to pass the method's value by reference (using pointer) and not by value (default everywhere)
+```
+package main
+import (
+    "fmt"
+)
+type Mutable struct {
+    a int
+    b int
+}
+func (m Mutable) StayTheSame() {
+    m.a = 3
+    m.b = 13
+}
+func (m *Mutable) Mutatue() {
+    m.a = 3
+    m.b = 13
+}
+func main() {
+    // assign
+    m := &Mutable{0, 0}
+    m.StayTheSame()
+    fmt.Println(m)
+    m.Mutatue()
+    fmt.Println(m)
+    fmt.Print(m.a)
+    // OOP WAY
+    m.a = 12212
+    fmt.Println(m.a)
+}
+// λ go run hello.go
+// &{0 0}
+// &{3 13}
+// 312212
+```
+
+- we can define methods on any type (not just structs)
+    - **it's like CSHARP extention method**
+- note that this time we didn't use pointer
+```
+package main
+import (
+	"fmt"
+	"math"
+)
+type MyFloat float64
+func (f MyFloat) Abs() float64 {
+	if f < 0 {
+		return float64(-f)
+	}
+	return float64(f)
+}
+func main() {
+	f := MyFloat(-math.Sqrt2)
+	fmt.Println(f.Abs())
+}
+```
+- Another example
+```
+package main
+import (
+    "fmt"
+)
+type Vertex struct {
+    X, Y float64
+}
+func (v *Vertex) Scale(f float64) {
+    v.X = v.X*f
+    v.Y = v.Y*f
+}
+func (v Vertex) Abs() float64{
+    return v.X*v.X + v.Y*v.Y
+}
+func main() {
+    v := &Vertex{3,4}
+    fmt.Println(v.Abs())
+    v.Scale(2.1)
+    fmt.Println(v.Abs())
+}
+```
+
+### Interfaces
+- it's a set of methods:
+```
+type Abser interface {
+    Abs() float64
+}
+```
+- didn't get this example completely
+```
+package main
+import (
+    "fmt"
+)
+// Interface
+type Abser interface {
+    Abs() float64
+}
+type MyFloat float64
+func (f MyFloat) Abs() float64 {
+    if f < 0 { return float64(-f) }
+    return float64(-f)
+}
+type Vertex struct {
+    X, Y float64
+}
+func (v *Vertex) Abs() float64 {
+    return v.X*v.Y  // just for the test
+}
+func main() {
+    var a Abser
+    f := MyFloat(-23.232)
+    v := Vertex{2.4, 6.2} 
+    a = f   // a MyFloat implements Abser (IT IS NOT F=A)
+            // ALSO if we want to implement an interface we need to have that method
+    fmt.Println(a.Abs())   
+    // a = v  // YOU'LL GET AN ERROR
+    a = &v  // a *Vertex implements Abser
+    fmt.Println(a.Abs())
+}
+```
