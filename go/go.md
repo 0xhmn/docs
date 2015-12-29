@@ -228,6 +228,39 @@ done
 
 ### Pointers
 - basic
+    - we get the memory address using `&`
+```
+package main
+import "fmt"
+const meterToYard float64 = 1.09
+func main() {
+    var meters float64
+    fmt.Println("Enter meters swam: ")
+    // put the value from the user on "meters" memory place
+    fmt.Scan(&meters)
+    yards := meters*meterToYard
+    fmt.Println("It's ", yards, " yards!")
+}
+```
+    - we point to a memeory address using `*`
+```
+package main
+import (
+    "fmt" 
+    "reflect"
+)
+const meterToYard float64 = 1.09
+func main() {
+    a := 34
+    fmt.Println(a)
+    fmt.Println(&a)
+    var b *int = &a                 //is equal to var b = &a
+    fmt.Println(b)                  // will print address of a
+    fmt.Println(*b)                 // 34
+    fmt.Println(reflect.TypeOf(b))  // *int
+}
+```
+- more example
 ```
 func main() {
     i, j := 42, 2834
@@ -604,7 +637,7 @@ type Abser interface {
     Abs() float64
 }
 ```
-- didn't get this example completely
+- *didn't get this example completely*
 ```
 package main
 import (
