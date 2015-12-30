@@ -226,72 +226,6 @@ done
 3
 ```
 
-### Pointers
-- basic
-    - we get the memory address using `&`
-```
-package main
-import "fmt"
-const meterToYard float64 = 1.09
-func main() {
-    var meters float64
-    fmt.Println("Enter meters swam: ")
-    // put the value from the user on "meters" memory place
-    fmt.Scan(&meters)
-    yards := meters*meterToYard
-    fmt.Println("It's ", yards, " yards!")
-}
-```
-    - we point to a memeory address using `*`
-```
-package main
-import (
-    "fmt" 
-    "reflect"
-)
-const meterToYard float64 = 1.09
-func main() {
-    a := 34
-    fmt.Println(a)
-    fmt.Println(&a)
-    var b *int = &a                 //is equal to var b = &a
-    fmt.Println(b)                  // will print address of a
-    fmt.Println(*b)                 // 34
-    fmt.Println(reflect.TypeOf(b))  // *int
-}
-```
-- more example
-```
-func main() {
-    i, j := 42, 2834
-    
-    p := &i     // point to i
-    j++
-    
-    // p and i pointing to the same place (i.e. 0xc0820062b0)
-    fmt.Println(&i)
-    fmt.Println(p)
-    
-    // changed the value of pointer -> i is changed
-    *p = 7
-    fmt.Println(&i)
-    fmt.Println(i)
-    
-    // pointing to j
-    p = &j
-    *p = *p / 37
-    fmt.Println(j)
-    fmt.Println(*p)
-}
-```
-The type *T is a pointer to a T value. Its zero value is nil.
-```
-var p *int
-// for instantiating:
-i := 13
-var pp *int = &i
-```
-
 ### Struct
 - basic
 ```
@@ -668,5 +602,100 @@ func main() {
     // a = v  // YOU'LL GET AN ERROR
     a = &v  // a *Vertex implements Abser
     fmt.Println(a.Abs())
+}
+```
+- another example
+```
+package main
+import (
+    "fmt" 
+)
+type Drawer interface {
+    Draw()
+}
+type Circle struct {
+    r int
+}
+func (c Circle) Draw() {
+    fmt.Println("draw a circle")
+}
+type Rectangular struct {
+    a,b int
+}
+func (r Rectangular) Draw() {
+    fmt.Println("Draw a rectangular")
+}
+func DrawForm(d Drawer) {
+    d.Draw()
+}
+func main() {
+    c := Circle{2}
+    r := Rectangular{2,4}
+    // var d Drawer
+    // d = c
+    // d = r
+    // fmt.Println(d)  // {2. 4}
+    // d.Draw()
+    DrawForm(c)
+    DrawForm(r)
+}
+// λ go run hello.go
+// draw a circle
+// Draw a rectangular
+```
+- overriding
+here we are overriding the fmt (to string) function - note that we're using `String` and not string
+```
+package main
+import (
+    "fmt" 
+)
+type Person struct {
+    name string
+    age int
+}
+// https://golang.org/pkg/fmt/#Stringer
+// type Stringer interface {
+//         String() string
+// } 
+func (p Person) String() string {
+    return fmt.Sprintf("%v (%v years)", p.name, p.age)
+}
+func main() {
+    a := Person{"Hooman", 25}
+    fmt.Println(a)
+}
+```
+
+### Errors
+- Go programs express error state with error values.
+- The error type is a built-in interface similar to `fmt.Stringer`:
+```
+type error interface {
+    Error() string
+}
+```
+- example:
+```
+package main
+import (
+    "fmt"
+    "time"
+)
+type MyError struct {
+    ErrorTime time.Time
+    ErrorType string
+}
+// overriding the Error
+func (e MyError) Error() string {
+    return fmt.Sprintf("at %v, %s happened!", e.ErrorTime, e.ErrorType)
+}
+func makeError() error{
+    return MyError{time.Now(), "StackOverFlow"}
+}
+func main() {
+    if err := makeError(); err != nil {
+        fmt.Println(err)
+    }
 }
 ```
