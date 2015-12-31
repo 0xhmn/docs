@@ -9,6 +9,7 @@
 ### operators
 - The `:=` notation serves both as a declaration and as initialization.
 [source](http://stackoverflow.com/questions/16521472/assignment-operator-in-go-language)
+
 ```
 foo := "bar"
 is equivalent to
@@ -16,6 +17,7 @@ var foo = "bar"
 or
 var foo string = "bar"
 ```
+
 ```
 name := "John"
 is just syntactic sugar for
@@ -540,7 +542,7 @@ func main() {
 	fmt.Println(f.Abs())
 }
 ```
-- Another example
+- Another example - **using a pointer vs not using a pointer in a method**
 ```
 package main
 import (
@@ -571,6 +573,10 @@ type Abser interface {
     Abs() float64
 }
 ```
+- **IMPORTANT** In Go, explicit declaration of interface implementation is not required. You just need to implement the methods defined in the interface into your struct type where you want to implement an interface type.
+- **IMPORTANT** GO'S TYPE SYSTEM DOEST NOT SUPPORT INHERITENCE. [ISNTEAD WE USE COMPOSITION](http://stackoverflow.com/questions/49002/prefer-composition-over-inheritance)
+  - When we embed a type into another type, the methods of the embedded type will avail to the new type
+  - We can also override the methods of Person in the new types. (INHERITENCE EXAMPLE in exmpale sheet)
 - *didn't get this example completely*
 ```
 package main
